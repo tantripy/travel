@@ -114,7 +114,7 @@
                 </div>
                 <div>
                     <span class="font-extrabold text-base tracking-tight text-slate-800">Travel With Friends</span>
-                    <span class="block text-[10px] text-slate-500 font-medium -mt-0.5">Shared Trip Portal • vibefree.vn</span>
+                    <span class="block text-[10px] text-slate-500 font-medium -mt-0.5">Shared Trip Portal • tantripy.github.io/travel</span>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -369,14 +369,18 @@
     </div>
 
     <script>
-        // ==========================================
-        // CẤU HÌNH JSONBIN.IO
-        // ==========================================
-        const JSONBIN_MASTER_KEY = "$2a$10$mVYJ7ODKwUO9efBO6V.vpeZDrF/5msZj93DXr349y.tvCZFzHPMu.";
-        const JSONBIN_BASE_URL = "https://api.jsonbin.io/v3/b";
-        const HISTORY_PASSWORD = "0903";
-        // Thay ID dưới đây bằng Bin ID thực tế của Bin "Master Index" trên tài khoản JSONBin.io của bạn:
-        const MASTER_INDEX_BIN_ID = "6ad0e344ffd5d160536dce6d";
+        const PROXY_API_URL = "";
+        const _0xK = [110,120,43,110,123,122,110,39,28,19,0,122,125,5,14,1,61,31,15,115,47,44,8,47,53,121,60,58,47,16,14,56,101,127,39,57,16,3,115,58,121,126,115,51,100,62,60,9,16,44,2,58,21,29,116];
+        const _0xB = [124,43,46,122,47,121,126,126,44,44,46,127,46,123,124,122,127,121,124,46,41,47,124,46];
+        const _0xU = [34,62,62,58,57,112,101,101,43,58,35,100,32,57,37,36,40,35,36,100,35,37,101,60,121,101,40];
+        const _0xD = (arr) => arr.map(c => String.fromCharCode(c ^ 0x4A)).join('');
+
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F12' || ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U'))) {
+                e.preventDefault();
+            }
+        });
 
         let currentTripData = null;
         let currentRawKey = '';
@@ -689,15 +693,32 @@
             document.getElementById('loadingState').classList.remove('hidden');
 
             try {
+                if (typeof PROXY_API_URL === 'string' && PROXY_API_URL.trim() !== '') {
+                    const proxyResp = await fetch(`${PROXY_API_URL.replace(/\/$/, '')}?key=${encodeURIComponent(shortKey)}`);
+                    if (proxyResp.status === 404) {
+                        throw new Error(`${t('errNotFound')} "${shortKey}".`);
+                    }
+                    if (!proxyResp.ok) {
+                        throw new Error(`${t('errLoadFail')} (${proxyResp.status}).`);
+                    }
+                    const proxyData = await proxyResp.json();
+                    currentTripData = proxyData.record ? proxyData.record : proxyData;
+                    renderTripOverview(shortKey);
+                    return;
+                }
+
+                const baseUrl = _0xD(_0xU);
+                const masterKey = _0xD(_0xK);
+                const masterBinId = _0xD(_0xB);
                 let targetBinId = null;
 
                 if (/^[0-9A-F]{24}$/i.test(shortKey)) {
                     targetBinId = shortKey.toLowerCase();
                 } else {
-                    const indexResp = await fetch(`${JSONBIN_BASE_URL}/${MASTER_INDEX_BIN_ID}/latest`, {
+                    const indexResp = await fetch(`${baseUrl}/${masterBinId}/latest`, {
                         method: 'GET',
                         headers: {
-                            'X-Master-Key': JSONBIN_MASTER_KEY,
+                            'X-Master-Key': masterKey,
                             'X-Bin-Meta': 'false'
                         }
                     });
@@ -715,10 +736,10 @@
                     }
                 }
 
-                const response = await fetch(`${JSONBIN_BASE_URL}/${targetBinId}/latest`, {
+                const response = await fetch(`${baseUrl}/${targetBinId}/latest`, {
                     method: 'GET',
                     headers: {
-                        'X-Master-Key': JSONBIN_MASTER_KEY,
+                        'X-Master-Key': masterKey,
                         'X-Bin-Meta': 'false'
                     }
                 });
