@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel With Friends - Thông Tin Chuyến Đi</title>
+    <title>Travel With Friends - Shared Trip Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #f2f9f5 0%, #e4f2eb 100%);
+            background: radial-gradient(circle at 12% 15%, rgba(56, 189, 248, 0.16), transparent 40%),
+                        radial-gradient(circle at 88% 82%, rgba(16, 185, 129, 0.14), transparent 45%),
+                        linear-gradient(180deg, #f0f7ff 0%, #eaf3fb 50%, #f1f8f5 100%);
             min-height: 100vh;
         }
         .card-hover {
@@ -18,7 +20,7 @@
         }
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.1);
         }
         .boarding-pass {
             position: relative;
@@ -29,7 +31,7 @@
             top: 50%;
             width: 18px;
             height: 18px;
-            background-color: #ecf5f0;
+            background-color: #eef5fb;
             border-radius: 50%;
             transform: translateY(-50%);
             z-index: 10;
@@ -42,14 +44,21 @@
             right: -10px;
             border-left: 1.5px solid rgba(168, 85, 247, 0.25);
         }
-        /* iOS Glassmorphism Card */
         .ios-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px -15px rgba(16, 185, 129, 0.12), 0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 24px 48px -15px rgba(37, 99, 235, 0.12), 0 0 1px 1px rgba(255, 255, 255, 0.9) inset;
         }
-        /* Custom scrollbar */
+        .lang-card {
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .lang-card:hover {
+            transform: translateY(-4px) scale(1.02);
+        }
+        .lang-card:active {
+            transform: scale(0.97);
+        }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
@@ -57,11 +66,50 @@
 </head>
 <body class="text-slate-800 relative overflow-x-hidden flex flex-col min-h-screen">
 
-    <!-- Top Navbar (Ẩn khi ở màn hình nhập key, hiện khi vào xem chuyến đi) -->
-    <header id="topNavbar" class="hidden sticky top-0 z-30 backdrop-blur-md bg-white/75 border-b border-emerald-100/80 shadow-sm">
+    <!-- ===================================================== -->
+    <!-- POPUP CHỌN NGÔN NGỮ KHI MỞ WEB                         -->
+    <!-- ===================================================== -->
+    <div id="languagePopupModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-4 transition-opacity">
+        <div class="w-full max-w-md ios-card rounded-[32px] p-7 sm:p-8 text-center border border-white/80 shadow-2xl">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                <i class="fa-solid fa-earth-asia"></i>
+            </div>
+            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Choose Language</h2>
+            <p class="text-xs text-slate-500 mt-1 mb-6 font-medium">Chọn ngôn ngữ hiển thị • 言語を選択 • 选择语言</p>
+
+            <div class="grid grid-cols-2 gap-3.5">
+                <button onclick="selectLanguage('vi')" class="lang-card group flex flex-col items-center justify-center p-4 rounded-2xl bg-white/95 hover:bg-blue-50/80 border-2 border-slate-200/80 hover:border-blue-500 shadow-sm">
+                    <span class="text-4xl mb-2.5 drop-shadow-xs">🇻🇳</span>
+                    <span class="font-extrabold text-sm text-slate-800 group-hover:text-blue-600">Tiếng Việt</span>
+                    <span class="text-[10px] text-slate-400 font-medium mt-0.5">Vietnamese</span>
+                </button>
+
+                <button onclick="selectLanguage('en')" class="lang-card group flex flex-col items-center justify-center p-4 rounded-2xl bg-white/95 hover:bg-blue-50/80 border-2 border-slate-200/80 hover:border-blue-500 shadow-sm">
+                    <span class="text-4xl mb-2.5 drop-shadow-xs">🇺🇸</span>
+                    <span class="font-extrabold text-sm text-slate-800 group-hover:text-blue-600">English</span>
+                    <span class="text-[10px] text-slate-400 font-medium mt-0.5">International</span>
+                </button>
+
+                <button onclick="selectLanguage('ja')" class="lang-card group flex flex-col items-center justify-center p-4 rounded-2xl bg-white/95 hover:bg-blue-50/80 border-2 border-slate-200/80 hover:border-blue-500 shadow-sm">
+                    <span class="text-4xl mb-2.5 drop-shadow-xs">🇯🇵</span>
+                    <span class="font-extrabold text-sm text-slate-800 group-hover:text-blue-600">日本語</span>
+                    <span class="text-[10px] text-slate-400 font-medium mt-0.5">Japanese</span>
+                </button>
+
+                <button onclick="selectLanguage('zh-Hans')" class="lang-card group flex flex-col items-center justify-center p-4 rounded-2xl bg-white/95 hover:bg-blue-50/80 border-2 border-slate-200/80 hover:border-blue-500 shadow-sm">
+                    <span class="text-4xl mb-2.5 drop-shadow-xs">🇨🇳</span>
+                    <span class="font-extrabold text-sm text-slate-800 group-hover:text-blue-600">简体中文</span>
+                    <span class="text-[10px] text-slate-400 font-medium mt-0.5">Chinese</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navbar -->
+    <header id="topNavbar" class="hidden sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-blue-100/80 shadow-xs">
         <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-sm">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-sm shadow-blue-500/20">
                     <i class="fa-solid fa-plane-departure text-sm"></i>
                 </div>
                 <div>
@@ -70,11 +118,15 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="showKeyEntryGate()" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs flex items-center gap-1.5 transition" title="Đổi mã khác">
-                    <i class="fa-solid fa-key"></i>
-                    <span class="hidden sm:inline">Đổi Mã</span>
+                <button onclick="openLanguagePopup()" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1.5 transition" title="Change Language">
+                    <span id="navLangFlag" class="text-sm">🇻🇳</span>
+                    <span id="navLangLabel" class="hidden sm:inline">Tiếng Việt</span>
                 </button>
-                <button onclick="copyCurrentUrl()" class="px-3.5 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-xs flex items-center gap-1.5 transition">
+                <button onclick="showKeyEntryGate()" class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-key text-blue-600"></i>
+                    <span id="navChangeKeyText" class="hidden sm:inline">Đổi Mã</span>
+                </button>
+                <button onclick="copyCurrentUrl()" class="px-3.5 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-share-nodes"></i>
                     <span id="copyBtnText">Copy Link</span>
                 </button>
@@ -83,28 +135,37 @@
     </header>
 
     <!-- ===================================================== -->
-    <!-- MÀN HÌNH CHÍNH GIỮA: NHẬP KEY (iOS Style Rounded Box) -->
+    <!-- MÀN HÌNH CHÍNH GIỮA: NHẬP KEY (Modern iOS Card)        -->
     <!-- ===================================================== -->
     <section id="keyEntryScreen" class="hidden flex-1 flex items-center justify-center px-4 py-12">
-        <div class="w-full max-w-sm ios-card rounded-[32px] p-7 sm:p-8 text-center border border-white/60">
-            <!-- App Icon -->
-            <div class="w-16 h-16 rounded-[20px] bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white text-2xl mx-auto mb-5 shadow-lg shadow-emerald-500/25">
+        <div class="w-full max-w-md ios-card rounded-[32px] p-7 sm:p-9 text-center border border-white/80 relative">
+            <button onclick="openLanguagePopup()" class="absolute top-5 right-5 px-3 py-1.5 rounded-full bg-slate-100/90 hover:bg-slate-200/80 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition border border-slate-200/60">
+                <span id="gateLangFlag">🇻🇳</span>
+                <span id="gateLangName">Tiếng Việt</span>
+                <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
+            </button>
+
+            <div class="w-16 h-16 rounded-[22px] bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white text-2xl mx-auto mb-5 shadow-lg shadow-blue-500/30 mt-2">
                 <i class="fa-solid fa-plane-departure"></i>
             </div>
 
-            <h1 id="gateTitle" class="text-xl font-extrabold text-slate-800 tracking-tight">Tra Cứu Chuyến Đi</h1>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[11px] font-bold mb-2 border border-blue-100">
+                <i class="fa-solid fa-sparkles text-[10px]"></i>
+                <span>Travel With Friends</span>
+            </div>
+
+            <h1 id="gateTitle" class="text-2xl font-extrabold text-slate-900 tracking-tight">Tra Cứu Chuyến Đi</h1>
             <p id="gateSubtitle" class="text-xs text-slate-500 mt-1.5 mb-6 leading-relaxed">
                 Nhập mã <b>6 ký tự</b> từ ứng dụng <b>Travel With Friends</b> để xem toàn bộ lịch trình và chi phí.
             </p>
 
-            <!-- Thông báo lỗi nếu nhập sai mã -->
             <div id="gateErrorBox" class="hidden mb-4 px-3.5 py-2.5 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-xs font-medium">
                 Mã chuyến đi không hợp lệ hoặc không tồn tại.
             </div>
 
-            <!-- iOS Rounded Textbox & Button Truy Cập -->
             <form onsubmit="event.preventDefault(); submitAccessKey();" class="space-y-3.5">
-                <div class="relative">
+                <div class="relative flex items-center">
+                    <i class="fa-solid fa-key absolute left-4 text-blue-500 text-sm"></i>
                     <input
                         id="centerKeyInput"
                         type="text"
@@ -113,15 +174,15 @@
                         autocapitalize="characters"
                         spellcheck="false"
                         placeholder="Nhập mã 6 ký tự (VD: 4K9XA2)"
-                        class="w-full px-5 py-3.5 rounded-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-slate-200/90 text-center text-base font-mono font-bold tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition shadow-inner uppercase"
+                        class="w-full pl-10 pr-5 py-3.5 rounded-2xl bg-slate-100/90 hover:bg-slate-100 focus:bg-white border border-slate-200/90 text-center text-base font-mono font-bold tracking-wider text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition shadow-inner uppercase"
                     >
                 </div>
 
                 <button
                     type="submit"
-                    class="w-full py-3.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 active:scale-[0.98] text-white font-bold text-sm shadow-md shadow-emerald-600/25 transition flex items-center justify-center gap-2"
+                    class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 active:scale-[0.98] text-white font-bold text-sm shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2"
                 >
-                    <span>Truy Cập</span>
+                    <span id="gateSubmitText">Truy Cập Hành Trình</span>
                     <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
             </form>
@@ -129,14 +190,14 @@
     </section>
 
     <!-- ===================================================== -->
-    <!-- MÀN HÌNH LOADING (Khi có param ?key=xxxx)             -->
+    <!-- MÀN HÌNH LOADING                                      -->
     <!-- ===================================================== -->
     <section id="loadingState" class="hidden flex-1 flex flex-col items-center justify-center px-4 py-20 text-center">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-md mb-4">
-            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-emerald-600"></i>
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600"></i>
         </div>
-        <h2 class="text-lg font-bold text-slate-700">Đang tải thông tin chuyến đi...</h2>
-        <p class="text-sm text-slate-500 mt-1">Vui lòng đợi trong giây lát</p>
+        <h2 id="loadingTitle" class="text-lg font-bold text-slate-700">Đang tải thông tin chuyến đi...</h2>
+        <p id="loadingSubtitle" class="text-sm text-slate-500 mt-1">Vui lòng đợi trong giây lát</p>
     </section>
 
     <!-- ===================================================== -->
@@ -145,131 +206,137 @@
     <main id="tripContent" class="hidden max-w-4xl w-full mx-auto px-4 pt-6 pb-20 space-y-6">
 
         <!-- Trip Banner Header -->
-        <div class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-sm border border-emerald-100 text-center relative overflow-hidden">
-            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-emerald-50/70 pointer-events-none"></div>
-            <div class="absolute -left-8 -bottom-8 w-24 h-24 rounded-full bg-teal-50/70 pointer-events-none"></div>
+        <div class="ios-card rounded-3xl p-6 sm:p-7 border border-blue-100/90 text-center relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-blue-50/70 pointer-events-none"></div>
+            <div class="absolute -left-8 -bottom-8 w-28 h-28 rounded-full bg-cyan-50/70 pointer-events-none"></div>
             
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-3" id="tripTypeBadge">
+            <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold mb-3" id="tripTypeBadge">
                 <i class="fa-solid fa-suitcase-rolling"></i>
                 <span id="tripTypeText">Du lịch nhóm</span>
             </div>
 
             <h1 id="tripTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Tên Chuyến Đi</h1>
             
-            <p id="tripDates" class="text-sm font-medium text-slate-500 mt-2 flex items-center justify-center gap-2">
-                <i class="fa-regular fa-calendar text-emerald-600"></i>
+            <p id="tripDates" class="text-sm font-semibold text-slate-500 mt-2 flex items-center justify-center gap-2">
+                <i class="fa-regular fa-calendar text-blue-600"></i>
                 <span id="tripDateRange">--/--/---- - --/--/----</span>
             </p>
 
-            <div class="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-400">
-                <span id="shareCodeBadge" class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono font-bold">Key: ---</span>
-                <span id="updatedAtBadge" class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-500">Cập nhật: ---</span>
+            <div class="mt-3.5 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-400">
+                <span id="shareCodeBadge" class="px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 font-mono font-bold">Key: ---</span>
+                <span id="updatedAtBadge" class="px-3 py-1 rounded-full bg-slate-100 text-slate-500 font-medium">Cập nhật: ---</span>
             </div>
         </div>
 
-        <!-- 6 Feature Cards Grid (Giống hệt iOS TripDetailView) -->
+        <!-- 6 Feature Cards Grid -->
         <div id="featureGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             
             <!-- 1. Thành Viên -->
-            <button onclick="openPanel('members')" id="card-members" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-blue-500/10 to-white border-2 border-blue-500/20 shadow-sm">
+            <button onclick="openPanel('members')" id="card-members" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-blue-500/12 via-white to-white border-2 border-blue-500/25 shadow-sm">
                 <div class="flex items-center justify-between w-full">
-                    <div class="w-9 h-9 rounded-full bg-blue-500/15 text-blue-600 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-600 flex items-center justify-center">
                         <i class="fa-solid fa-users text-sm"></i>
                     </div>
-                    <i class="fa-solid fa-shield-halved text-emerald-500 text-sm"></i>
+                    <i class="fa-solid fa-id-badge text-blue-400 text-sm"></i>
                 </div>
                 <div>
-                    <div class="font-bold text-sm text-slate-800">Thành Viên</div>
+                    <div id="cardTitle-members" class="font-extrabold text-sm text-slate-800">Thành Viên</div>
                     <div id="count-members" class="text-xs font-medium text-slate-500 mt-0.5">0 người</div>
                 </div>
             </button>
 
             <!-- 2. Nơi Ở -->
-            <button onclick="openPanel('hotels')" id="card-hotels" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-orange-500/12 to-white border-2 border-orange-500/20 shadow-sm">
+            <button onclick="openPanel('hotels')" id="card-hotels" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-orange-500/12 via-white to-white border-2 border-orange-500/25 shadow-sm">
                 <div class="flex items-center justify-between w-full">
-                    <div class="w-7 h-5 rounded bg-gradient-to-br from-yellow-400 to-amber-600 shadow-inner"></div>
-                    <i class="fa-solid fa-wifi text-orange-400 text-xs"></i>
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/15 text-orange-600 flex items-center justify-center">
+                        <i class="fa-solid fa-hotel text-sm"></i>
+                    </div>
+                    <i class="fa-solid fa-key text-orange-400 text-xs"></i>
                 </div>
                 <div>
-                    <div class="font-bold text-sm text-slate-800">Nơi Ở</div>
+                    <div id="cardTitle-hotels" class="font-extrabold text-sm text-slate-800">Nơi Ở</div>
                     <div id="count-hotels" class="text-xs font-medium text-slate-500 mt-0.5">0 địa điểm</div>
                 </div>
             </button>
 
             <!-- 3. Di Chuyển -->
-            <button onclick="openPanel('transports')" id="card-transports" class="card-hover boarding-pass text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-purple-500/10 to-white border-2 border-purple-500/20 shadow-sm overflow-hidden">
+            <button onclick="openPanel('transports')" id="card-transports" class="card-hover boarding-pass text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-purple-500/12 via-white to-white border-2 border-purple-500/25 shadow-sm overflow-hidden">
                 <div class="flex items-center justify-between w-full">
-                    <i class="fa-solid fa-plane-departure text-purple-600 text-lg"></i>
-                    <span class="text-[9px] font-black text-purple-600 bg-purple-500/15 px-1.5 py-0.5 rounded">PASS</span>
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-600 flex items-center justify-center">
+                        <i class="fa-solid fa-plane-departure text-sm"></i>
+                    </div>
+                    <span class="text-[9px] font-black text-purple-600 bg-purple-500/15 px-2 py-0.5 rounded-full">PASS</span>
                 </div>
                 <div class="border-t border-dashed border-purple-300/70 my-1"></div>
                 <div>
-                    <div class="font-bold text-sm text-slate-800">Di Chuyển</div>
+                    <div id="cardTitle-transports" class="font-extrabold text-sm text-slate-800">Di Chuyển</div>
                     <div id="count-transports" class="text-xs font-medium text-slate-500 mt-0.5">0 lượt</div>
                 </div>
             </button>
 
             <!-- 4. Lịch Trình -->
-            <button onclick="openPanel('itineraries')" id="card-itineraries" class="card-hover text-left rounded-2xl overflow-hidden h-36 flex bg-gradient-to-br from-emerald-500/10 to-white border-2 border-emerald-500/25 shadow-sm">
-                <div class="w-5 bg-slate-200/70 flex flex-col items-center justify-center gap-1.5 py-2">
-                    <span class="w-2 h-2.5 rounded-sm bg-slate-400/70"></span>
-                    <span class="w-2 h-2.5 rounded-sm bg-slate-400/70"></span>
-                    <span class="w-2 h-2.5 rounded-sm bg-slate-400/70"></span>
-                    <span class="w-2 h-2.5 rounded-sm bg-slate-400/70"></span>
+            <button onclick="openPanel('itineraries')" id="card-itineraries" class="card-hover text-left rounded-2xl overflow-hidden h-36 flex bg-gradient-to-br from-emerald-500/12 via-white to-white border-2 border-emerald-500/25 shadow-sm">
+                <div class="w-4 bg-emerald-100/80 flex flex-col items-center justify-center gap-1.5 py-2">
+                    <span class="w-1.5 h-2.5 rounded-full bg-emerald-500/60"></span>
+                    <span class="w-1.5 h-2.5 rounded-full bg-emerald-500/60"></span>
+                    <span class="w-1.5 h-2.5 rounded-full bg-emerald-500/60"></span>
                 </div>
                 <div class="p-4 flex-1 flex flex-col justify-between">
                     <div class="flex items-center justify-between">
-                        <i class="fa-solid fa-book-open text-emerald-600 text-sm"></i>
-                        <div class="space-y-1">
-                            <div class="w-6 h-1 rounded-full bg-emerald-500/40"></div>
-                            <div class="w-4 h-1 rounded-full bg-emerald-500/25 ml-auto"></div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
+                            <i class="fa-solid fa-map-location-dot text-sm"></i>
                         </div>
+                        <i class="fa-regular fa-calendar-check text-emerald-500 text-xs"></i>
                     </div>
                     <div>
-                        <div class="font-bold text-sm text-slate-800">Lịch Trình</div>
+                        <div id="cardTitle-itineraries" class="font-extrabold text-sm text-slate-800">Lịch Trình</div>
                         <div id="count-itineraries" class="text-xs font-medium text-slate-500 mt-0.5">0 hoạt động</div>
                     </div>
                 </div>
             </button>
 
             <!-- 5. Voucher & Vé -->
-            <button onclick="openPanel('vouchers')" id="card-vouchers" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-pink-500/10 to-white border-2 border-dashed border-pink-500/35 shadow-sm">
+            <button onclick="openPanel('vouchers')" id="card-vouchers" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-b from-pink-500/12 via-white to-white border-2 border-dashed border-pink-500/35 shadow-sm">
                 <div class="flex items-center justify-between w-full">
-                    <i class="fa-solid fa-qrcode text-pink-600 text-xl"></i>
-                    <i class="fa-solid fa-scissors text-slate-400 text-xs"></i>
+                    <div class="w-10 h-10 rounded-xl bg-pink-500/15 text-pink-600 flex items-center justify-center">
+                        <i class="fa-solid fa-ticket text-sm"></i>
+                    </div>
+                    <i class="fa-solid fa-qrcode text-pink-400 text-sm"></i>
                 </div>
                 <div>
-                    <div class="font-bold text-sm text-slate-800">Voucher & Vé</div>
+                    <div id="cardTitle-vouchers" class="font-extrabold text-sm text-slate-800">Voucher & Vé</div>
                     <div id="count-vouchers" class="text-xs font-medium text-slate-500 mt-0.5">0 mã lưu trữ</div>
                 </div>
             </button>
 
             <!-- 6. Quản Lý Chi Tiêu -->
-            <button onclick="openPanel('expenses')" id="card-expenses" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-teal-500/15 to-white border-2 border-teal-500/25 shadow-sm">
+            <button onclick="openPanel('expenses')" id="card-expenses" class="card-hover text-left rounded-2xl p-4 h-36 flex flex-col justify-between bg-gradient-to-br from-teal-500/15 via-white to-white border-2 border-teal-500/25 shadow-sm">
                 <div class="flex items-center justify-between w-full">
-                    <i class="fa-solid fa-credit-card text-teal-600 text-lg"></i>
+                    <div class="w-10 h-10 rounded-xl bg-teal-500/15 text-teal-600 flex items-center justify-center">
+                        <i class="fa-solid fa-wallet text-sm"></i>
+                    </div>
                     <div class="flex -space-x-1.5">
                         <span class="w-3.5 h-3.5 rounded-full bg-orange-400/90 inline-block"></span>
                         <span class="w-3.5 h-3.5 rounded-full bg-red-500/90 inline-block"></span>
                     </div>
                 </div>
                 <div>
-                    <div class="font-bold text-sm text-slate-800 truncate">Quản Lý Chi Tiêu</div>
-                    <div id="count-expenses" class="text-[11px] font-medium text-slate-500 mt-0.5 truncate">Tính toán số dư tài chính</div>
+                    <div id="cardTitle-expenses" class="font-extrabold text-sm text-slate-800 truncate">Quản Lý Chi Tiêu</div>
+                    <div id="count-expenses" class="text-[11px] font-medium text-slate-500 mt-0.5 truncate">0 khoản giao dịch</div>
                 </div>
             </button>
 
         </div>
 
         <!-- Active Detail Panel Display -->
-        <div id="panelContainer" class="bg-white/95 backdrop-blur rounded-3xl shadow-md border border-slate-200/80 overflow-hidden transition-all">
+        <div id="panelContainer" class="ios-card rounded-3xl border border-white/90 overflow-hidden transition-all">
             <div id="panelHeader" class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-                <div class="flex items-center gap-2.5">
-                    <span id="panelIcon" class="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm bg-blue-600">
+                <div class="flex items-center gap-3">
+                    <span id="panelIcon" class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm bg-blue-600 shadow-xs">
                         <i class="fa-solid fa-users"></i>
                     </span>
                     <div>
-                        <h2 id="panelTitle" class="font-bold text-base text-slate-800">Thành Viên</h2>
+                        <h2 id="panelTitle" class="font-extrabold text-base text-slate-800">Thành Viên</h2>
                         <p id="panelSubtitle" class="text-xs text-slate-500">Danh sách thành viên tham gia đoàn</p>
                     </div>
                 </div>
@@ -282,11 +349,11 @@
 
     <!-- Member Transaction Modal -->
     <div id="memberModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
-            <div class="px-6 py-4 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100 flex items-center justify-between">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-blue-100 flex items-center justify-between">
                 <div>
                     <h3 id="modalMemberName" class="font-extrabold text-base text-slate-800">Chi tiết thành viên</h3>
-                    <p class="text-xs text-slate-500">Lịch sử giao dịch & số dư</p>
+                    <p id="modalMemberSub" class="text-xs text-slate-500">Lịch sử giao dịch & số dư</p>
                 </div>
                 <button onclick="closeMemberModal()" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center shadow-xs">
                     <i class="fa-solid fa-xmark"></i>
@@ -307,7 +374,218 @@
         const MASTER_INDEX_BIN_ID = "6ad0e344ffd5d160536dce6d";
 
         let currentTripData = null;
+        let currentRawKey = '';
         let activePanel = 'members';
+        let currentLang = 'vi';
+        let isInitialLoadDone = false;
+
+        const LANG_META = {
+            'vi': { flag: '🇻🇳', label: 'Tiếng Việt' },
+            'en': { flag: '🇺🇸', label: 'English' },
+            'ja': { flag: '🇯🇵', label: '日本語' },
+            'zh-Hans': { flag: '🇨🇳', label: '简体中文' }
+        };
+
+        const I18N = {
+            'vi': {
+                changeKey: 'Đổi Mã', copyLink: 'Copy Link', copied: 'Đã chép!',
+                gateTitle: 'Tra Cứu Chuyến Đi',
+                gateSubtitle: 'Nhập mã <b>6 ký tự</b> từ ứng dụng <b>Travel With Friends</b> để xem toàn bộ lịch trình và chi phí.',
+                gatePlaceholder: 'Nhập mã 6 ký tự (VD: 4K9XA2)',
+                gateSubmit: 'Truy Cập Hành Trình',
+                errEmptyKey: 'Vui lòng nhập mã chuyến đi 6 ký tự.',
+                errIndexConn: 'Không thể kết nối bảng mục lục.',
+                errNotFound: 'Không tìm thấy chuyến đi với mã',
+                errLoadFail: 'Không thể tải dữ liệu chuyến đi',
+                errInvalid: 'Mã chia sẻ không hợp lệ hoặc đã bị xoá.',
+                loadingTitle: 'Đang tải thông tin chuyến đi...',
+                loadingSubtitle: 'Vui lòng đợi trong giây lát',
+                tripDefaultTitle: 'Chuyến Đi',
+                groupTravel: 'Du lịch nhóm', gathering: 'Tụ tập / Ăn uống',
+                codePrefix: 'Mã', exportedAt: 'Xuất lúc',
+                cardMembers: 'Thành Viên', cardHotels: 'Nơi Ở', cardTransports: 'Di Chuyển',
+                cardItineraries: 'Lịch Trình', cardVouchers: 'Voucher & Vé', cardExpenses: 'Quản Lý Chi Tiêu',
+                unitMembers: 'người', unitHotels: 'địa điểm', unitTransports: 'lượt',
+                unitItineraries: 'hoạt động', unitVouchers: 'mã lưu trữ', unitExpenses: 'khoản giao dịch',
+                pTitleMembers: 'Danh Sách Thành Viên', pSubMembers: 'thành viên trong chuyến đi',
+                pTitleHotels: 'Nơi Ở & Phân Phòng', pSubHotels: 'địa điểm lưu trú',
+                pTitleTransports: 'Lịch Trình Di Chuyển', pSubTransports: 'Vé máy bay, tàu xe, quá cảnh & thuê xe',
+                pTitleItineraries: 'Lịch Trình Hoạt Động', pSubItineraries: 'Chi tiết các điểm đến theo từng ngày',
+                pTitleVouchers: 'Voucher & Vé Tham Quan', pSubVouchers: 'Mã kích hoạt, vé sự kiện và phân bổ chi phí',
+                pTitleExpenses: 'Quản Lý Chi Tiêu & Công Nợ', pSubExpenses: 'Tổng hợp đồng bộ tự động, nhập tay, chuyển tiền & số dư',
+                emptyMembers: 'Chưa có thành viên nào.', birthday: 'Sinh nhật', passportId: 'Hộ chiếu/CCCD', expiry: 'Hạn',
+                emptyHotels: 'Chưa có thông tin khách sạn / nơi ở.', sameRoomPrice: 'Đồng giá (Gộp chung)', roomList: 'Danh sách phòng', roomsUnit: 'phòng', paidBy: 'Trả', membersLabel: 'Thành viên', unassigned: 'Chưa xếp',
+                emptyTransports: 'Chưa có thông tin di chuyển.', roundTrip: 'Khứ hồi', oneWay: '1 chiều', departure: 'Khởi hành', arrival: 'Đến nơi', transit: 'Quá cảnh', nextFlight: 'Chuyến tiếp', pickupCar: 'Nhận xe', returnCar: 'Trả xe', returnLeg: 'Chiều về', returnTransit: 'Quá cảnh về', ticketDetail: 'Chi tiết vé thành viên', samePrice: 'Đồng giá', perTicket: 'Theo vé', baggage: 'Hành lý',
+                emptyItineraries: 'Chưa có hoạt động nào trong lịch trình.', dayPrefix: 'Ngày',
+                emptyVouchers: 'Chưa có Voucher hoặc Vé tham quan nào.', validDate: 'Hạn/Ngày dùng', codeLabel: 'Mã', payerLabel: 'Người trả', notSelected: 'Chưa chọn',
+                settledUp: 'Đã thanh toán đủ', toReceive: 'Được nhận', toPay: 'Phải trả', unknown: 'Chưa rõ',beneficiary: 'Hưởng', emptyExpenses: 'Chưa có khoản chi tiêu nào.', noteLabel: 'Nội dung', emptyTransfers: 'Chưa có giao dịch chuyển tiền nào.',
+                balanceTitle: 'Bảng Cân Đối Số Dư (Chạm vào tên để xem chi tiết)', transferTitle: 'Giao Dịch Chuyển Tiền Nội Bộ', allExpensesTitle: 'Tất Cả Khoản Chi',
+                modalSub: 'Lịch sử giao dịch & số dư', reportFor: 'Báo cáo', currencyLabel: 'Tiền tệ', balanceLabel: 'Số dư', settledZero: 'Đã thanh toán đủ (0)', paidAction: 'Chi trả', transferAction: 'Chuyển tiền', sentOut: 'Chuyển đi', receivedIn: 'Nhận vào', totalConsumedTitle: 'Tổng chi tiêu (Thực tế đã hưởng)', debtSummaryTitle: 'Tổng kết công nợ', txHistoryTitle: 'Lịch sử giao dịch'
+            },
+            'en': {
+                changeKey: 'Change Code', copyLink: 'Copy Link', copied: 'Copied!',
+                gateTitle: 'Find Your Trip',
+                gateSubtitle: 'Enter the <b>6-character code</b> from <b>Travel With Friends</b> app to view the full itinerary and expenses.',
+                gatePlaceholder: 'Enter 6-char code (e.g. 4K9XA2)',
+                gateSubmit: 'Access Trip',
+                errEmptyKey: 'Please enter a 6-character trip code.',
+                errIndexConn: 'Unable to connect to the trip directory.',
+                errNotFound: 'No trip found with code',
+                errLoadFail: 'Unable to load trip data',
+                errInvalid: 'Invalid or deleted share code.',
+                loadingTitle: 'Loading trip details...',
+                loadingSubtitle: 'Please wait a moment',
+                tripDefaultTitle: 'Trip',
+                groupTravel: 'Group Trip', gathering: 'Gathering / Dining',
+                codePrefix: 'Code', exportedAt: 'Updated',
+                cardMembers: 'Members', cardHotels: 'Stays', cardTransports: 'Transport',
+                cardItineraries: 'Itinerary', cardVouchers: 'Vouchers', cardExpenses: 'Expenses',
+                unitMembers: 'members', unitHotels: 'places', unitTransports: 'trips',
+                unitItineraries: 'activities', unitVouchers: 'saved codes', unitExpenses: 'transactions',
+                pTitleMembers: 'Member List', pSubMembers: 'members in this trip',
+                pTitleHotels: 'Stays & Rooms', pSubHotels: 'accommodations',
+                pTitleTransports: 'Transportation', pSubTransports: 'Flights, trains, transits & vehicle rentals',
+                pTitleItineraries: 'Activity Itinerary', pSubItineraries: 'Day-by-day destination schedule',
+                pTitleVouchers: 'Vouchers & Tickets', pSubVouchers: 'Promo codes, attraction tickets & cost split',
+                pTitleExpenses: 'Expenses & Balances', pSubExpenses: 'Auto-synced items, manual bills, transfers & balances',
+                emptyMembers: 'No members yet.', birthday: 'Birthday', passportId: 'Passport/ID', expiry: 'Exp',
+                emptyHotels: 'No hotel or stay information yet.', sameRoomPrice: 'Flat Rate (Combined)', roomList: 'Room List', roomsUnit: 'rooms', paidBy: 'Paid', membersLabel: 'Guests', unassigned: 'Unassigned',
+                emptyTransports: 'No transportation details yet.', roundTrip: 'Round-trip', oneWay: 'One-way', departure: 'Departure', arrival: 'Arrival', transit: 'Transit', nextFlight: 'Next', pickupCar: 'Pick-up', returnCar: 'Drop-off', returnLeg: 'Return', returnTransit: 'Return Transit', ticketDetail: 'Member Ticket Details', samePrice: 'Flat rate', perTicket: 'Per ticket', baggage: 'Baggage',
+                emptyItineraries: 'No activities in itinerary yet.', dayPrefix: 'Day',
+                emptyVouchers: 'No vouchers or tickets yet.', validDate: 'Valid/Use Date', codeLabel: 'Code', payerLabel: 'Paid by', notSelected: 'Not selected',
+                settledUp: 'Settled up', toReceive: 'Gets back', toPay: 'Owes', unknown: 'N/A', beneficiary: 'Split', emptyExpenses: 'No expenses recorded yet.', noteLabel: 'Note', emptyTransfers: 'No internal money transfers yet.',
+                balanceTitle: 'Balance Sheet (Tap a member for details)', transferTitle: 'Internal Money Transfers', allExpensesTitle: 'All Expenses',
+                modalSub: 'Transaction history & balance', reportFor: 'Report', currencyLabel: 'Currency', balanceLabel: 'Balance', settledZero: 'Settled up (0)', paidAction: 'Paid', transferAction: 'Transfer', sentOut: 'Sent', receivedIn: 'Received', totalConsumedTitle: 'Total Consumed (Actual Share)', debtSummaryTitle: 'Balance Summary', txHistoryTitle: 'Transaction History'
+            },
+            'ja': {
+                changeKey: 'コード変更', copyLink: 'リンクをコピー', copied: 'コピー完了!',
+                gateTitle: '旅行データを検索',
+                gateSubtitle: '<b>Travel With Friends</b> アプリの <b>6桁コード</b> を入力して旅程と費用を確認します。',
+                gatePlaceholder: '6桁のコードを入力 (例: 4K9XA2)',
+                gateSubmit: '旅程を開く',
+                errEmptyKey: '6桁の旅行コードを入力してください。',
+                errIndexConn: 'インデックスサーバーに接続できません。',
+                errNotFound: '該当する旅行が見つかりません:',
+                errLoadFail: 'データを読み込めませんでした',
+                errInvalid: '共有コードが無効か削除されています。',
+                loadingTitle: '旅行データを読み込み中...',
+                loadingSubtitle: '少々お待ちください',
+                tripDefaultTitle: '旅行',
+                groupTravel: 'グループ旅行', gathering: '集まり・食事会',
+                codePrefix: 'コード', exportedAt: '更新日時',
+                cardMembers: 'メンバー', cardHotels: '宿泊先', cardTransports: '移動・交通',
+                cardItineraries: 'スケジュール', cardVouchers: 'バウチャー・券', cardExpenses: '費用・精算',
+                unitMembers: '名', unitHotels: 'ヶ所', unitTransports: '件',
+                unitItineraries: '件の予定', unitVouchers: '件のコード', unitExpenses: '件の取引',
+                pTitleMembers: 'メンバー一覧', pSubMembers: '名が参加中',
+                pTitleHotels: '宿泊先・部屋割り', pSubHotels: 'ヶ所の宿泊施設',
+                pTitleTransports: '交通・移動スケジュール', pSubTransports: '航空券、列車、乗り継ぎ、レンタカー',
+                pTitleItineraries: '日別スケジュール', pSubItineraries: '日ごとの訪問先と予定の詳細',
+                pTitleVouchers: 'バウチャー & チケット', pSubVouchers: '引換コード、入場券と費用分担',
+                pTitleExpenses: '費用管理 & 精算バランス', pSubExpenses: '自動同期、手入力の支出、送金、残高照会',
+                emptyMembers: 'メンバーが登録されていません。', birthday: '誕生日', passportId: 'パスポート/ID', expiry: '期限',
+                emptyHotels: '宿泊情報がまだありません。', sameRoomPrice: '均一料金 (一括)', roomList: '部屋一覧', roomsUnit: '室', paidBy: '支払', membersLabel: '宿泊者', unassigned: '未割当',
+                emptyTransports: '移動情報がまだありません。', roundTrip: '往復', oneWay: '片道', departure: '出発', arrival: '到着', transit: '乗継', nextFlight: '次便', pickupCar: '貸出', returnCar: '返却', returnLeg: '復路', returnTransit: '復路乗継', ticketDetail: 'メンバー別チケット明細', samePrice: '均一料金', perTicket: '個別料金', baggage: '手荷物',
+                emptyItineraries: 'スケジュールがまだありません。', dayPrefix: '日目',
+                emptyVouchers: 'バウチャーやチケットがありません。', validDate: '有効期限/利用日', codeLabel: 'コード', payerLabel: '支払者', notSelected: '未選択',
+                settledUp: '精算済み', toReceive: '受取予定', toPay: '支払予定', unknown: '未定', beneficiary: '対象', emptyExpenses: '支出データがまだありません。', noteLabel: 'メモ', emptyTransfers: '送金履歴がまだありません。',
+                balanceTitle: '残高バランス表 (名前をタップして詳細表示)', transferTitle: 'メンバー間の送金履歴', allExpensesTitle: 'すべての支出',
+                modalSub: '取引履歴と残高の詳細', reportFor: 'レポート', currencyLabel: '通貨', balanceLabel: '残高', settledZero: '精算済み (0)', paidAction: '立替', transferAction: '送金', sentOut: '送金済', receivedIn: '受取済', totalConsumedTitle: '実質負担額の合計', debtSummaryTitle: '精算残高サマリー', txHistoryTitle: '取引履歴'
+            },
+            'zh-Hans': {
+                changeKey: '更换代码', copyLink: '复制链接', copied: '已复制!',
+                gateTitle: '查询行程信息',
+                gateSubtitle: '输入来自 <b>Travel With Friends</b> 应用的 <b>6位分享码</b> 查看完整行程与费用账单。',
+                gatePlaceholder: '输入6位代码 (例如: 4K9XA2)',
+                gateSubmit: '进入行程',
+                errEmptyKey: '请输入6位行程分享码。',
+                errIndexConn: '无法连接到行程索引目录。',
+                errNotFound: '未找到该分享码对应的行程:',
+                errLoadFail: '无法加载行程数据',
+                errInvalid: '分享码无效或已被删除。',
+                loadingTitle: '正在加载行程信息...',
+                loadingSubtitle: '请稍候',
+                tripDefaultTitle: '旅行',
+                groupTravel: '团队旅行', gathering: '聚会 / 聚餐',
+                codePrefix: '分享码', exportedAt: '更新于',
+                cardMembers: '同行成员', cardHotels: '酒店住宿', cardTransports: '交通出行',
+                cardItineraries: '行程安排', cardVouchers: '票券 & 优惠码', cardExpenses: '费用与账单',
+                unitMembers: '人', unitHotels: '处地点', unitTransports: '次出行',
+                unitItineraries: '项活动', unitVouchers: '张票券', unitExpenses: '笔交易',
+                pTitleMembers: '成员列表', pSubMembers: '位同行成员',
+                pTitleHotels: '住宿与房间分配', pSubHotels: '处住宿地点',
+                pTitleTransports: '交通出行安排', pSubTransports: '机票、火车、中转及租车信息',
+                pTitleItineraries: '每日行程活动', pSubItineraries: '按天排列的景点与活动详情',
+                pTitleVouchers: '票券与景点门票', pSubVouchers: '兑换码、活动门票及费用分摊',
+                pTitleExpenses: '费用管理与账单结算', pSubExpenses: '自动同步、手动记账、内部转账及余额平衡',
+                emptyMembers: '暂无成员信息。', birthday: '生日', passportId: '护照/证件号', expiry: '有效期',
+                emptyHotels: '暂无酒店或住宿信息。', sameRoomPrice: '统一价格 (合并)', roomList: '房间列表', roomsUnit: '间', paidBy: '付款', membersLabel: '入住成员', unassigned: '未分配',
+                emptyTransports: '暂无交通出行信息。', roundTrip: '往返', oneWay: '单程', departure: '出发', arrival: '到达', transit: '中转', nextFlight: '续程', pickupCar: '取车', returnCar: '还车', returnLeg: '返程', returnTransit: '返程中转', ticketDetail: '成员票价明细', samePrice: '统一票价', perTicket: '按票计价', baggage: '行李',
+                emptyItineraries: '暂无行程活动安排。', dayPrefix: '第',
+                emptyVouchers: '暂无优惠券或景点门票。', validDate: '有效期/使用日', codeLabel: '兑换码', payerLabel: '付款人', notSelected: '未选择',
+                settledUp: '已结清', toReceive: '应收回', toPay: '需支付', unknown: '未指定', beneficiary: '分摊', emptyExpenses: '暂无费用支出记录。', noteLabel: '备注', emptyTransfers: '暂无内部转账记录。',
+                balanceTitle: '账单余额表 (点击成员姓名查看明细)', transferTitle: '成员间转账记录', allExpensesTitle: '全部支出项目',
+                modalSub: '交易记录与账单余额', reportFor: '个人账单', currencyLabel: '币种', balanceLabel: '净余额', settledZero: '已结清 (0)', paidAction: '垫付', transferAction: '转账', sentOut: '转出', receivedIn: '收到', totalConsumedTitle: '个人实际消费总额', debtSummaryTitle: '应收/应付总结', txHistoryTitle: '相关交易明细'
+            }
+        };
+
+        function t(key) {
+            return (I18N[currentLang] && I18N[currentLang][key]) || I18N['vi'][key] || key;
+        }
+
+        function openLanguagePopup() {
+            document.getElementById('languagePopupModal').classList.remove('hidden');
+        }
+
+        function selectLanguage(lang) {
+            currentLang = I18N[lang] ? lang : 'vi';
+            document.documentElement.lang = currentLang;
+            document.getElementById('languagePopupModal').classList.add('hidden');
+            applyStaticTranslations();
+
+            if (!isInitialLoadDone) {
+                isInitialLoadDone = true;
+                startPortalAfterLanguageChoice();
+            } else if (currentTripData) {
+                renderTripOverview(currentRawKey, activePanel);
+            }
+        }
+
+        function applyStaticTranslations() {
+            const meta = LANG_META[currentLang] || LANG_META['vi'];
+            document.getElementById('navLangFlag').innerText = meta.flag;
+            document.getElementById('navLangLabel').innerText = meta.label;
+            document.getElementById('gateLangFlag').innerText = meta.flag;
+            document.getElementById('gateLangName').innerText = meta.label;
+
+            document.getElementById('navChangeKeyText').innerText = t('changeKey');
+            document.getElementById('copyBtnText').innerText = t('copyLink');
+            document.getElementById('gateTitle').innerText = t('gateTitle');
+            document.getElementById('gateSubtitle').innerHTML = t('gateSubtitle');
+            document.getElementById('centerKeyInput').placeholder = t('gatePlaceholder');
+            document.getElementById('gateSubmitText').innerText = t('gateSubmit');
+            document.getElementById('loadingTitle').innerText = t('loadingTitle');
+            document.getElementById('loadingSubtitle').innerText = t('loadingSubtitle');
+
+            document.getElementById('cardTitle-members').innerText = t('cardMembers');
+            document.getElementById('cardTitle-hotels').innerText = t('cardHotels');
+            document.getElementById('cardTitle-transports').innerText = t('cardTransports');
+            document.getElementById('cardTitle-itineraries').innerText = t('cardItineraries');
+            document.getElementById('cardTitle-vouchers').innerText = t('cardVouchers');
+            document.getElementById('cardTitle-expenses').innerText = t('cardExpenses');
+            document.getElementById('modalMemberSub').innerText = t('modalSub');
+        }
+
+        function startPortalAfterLanguageChoice() {
+            const params = new URLSearchParams(window.location.search);
+            const keyParam = params.get('key');
+
+            if (keyParam && keyParam.trim() !== '') {
+                fetchTripByShortKey(extractCleanKey(keyParam));
+            } else {
+                showKeyEntryGate();
+            }
+        }
 
         function extractCleanKey(rawInput) {
             let clean = rawInput.trim();
@@ -344,19 +622,12 @@
         function copyCurrentUrl() {
             navigator.clipboard.writeText(window.location.href);
             const btn = document.getElementById('copyBtnText');
-            btn.innerText = 'Đã chép!';
-            setTimeout(() => { btn.innerText = 'Copy Link'; }, 2000);
+            btn.innerText = t('copied');
+            setTimeout(() => { btn.innerText = t('copyLink'); }, 2000);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const keyParam = params.get('key');
-
-            if (keyParam && keyParam.trim() !== '') {
-                fetchTripByShortKey(extractCleanKey(keyParam));
-            } else {
-                showKeyEntryGate();
-            }
+            openLanguagePopup();
         });
 
         function showKeyEntryGate(errorMessage = null) {
@@ -381,7 +652,7 @@
         function submitAccessKey() {
             const val = document.getElementById('centerKeyInput').value.trim();
             if (!val) {
-                showKeyEntryGate("Vui lòng nhập mã chuyến đi 6 ký tự.");
+                showKeyEntryGate(t('errEmptyKey'));
                 return;
             }
             const cleanKey = extractCleanKey(val);
@@ -391,6 +662,7 @@
         }
 
         async function fetchTripByShortKey(shortKey) {
+            currentRawKey = shortKey;
             document.getElementById('keyEntryScreen').classList.add('hidden');
             document.getElementById('tripContent').classList.add('hidden');
             document.getElementById('loadingState').classList.remove('hidden');
@@ -398,11 +670,9 @@
             try {
                 let targetBinId = null;
 
-                // Nếu người dùng nhập trực tiếp Bin ID 24 ký tự hex
                 if (/^[0-9A-F]{24}$/i.test(shortKey)) {
                     targetBinId = shortKey.toLowerCase();
                 } else {
-                    // Tra cứu từ Master Index Bin bằng mã 6 ký tự
                     const indexResp = await fetch(`${JSONBIN_BASE_URL}/${MASTER_INDEX_BIN_ID}/latest`, {
                         method: 'GET',
                         headers: {
@@ -412,7 +682,7 @@
                     });
 
                     if (!indexResp.ok) {
-                        throw new Error("Không thể kết nối bảng mục lục (Kiểm tra lại MASTER_INDEX_BIN_ID).");
+                        throw new Error(t('errIndexConn'));
                     }
 
                     const indexData = await indexResp.json();
@@ -420,11 +690,10 @@
                     targetBinId = indexMap[shortKey];
 
                     if (!targetBinId) {
-                        throw new Error(`Không tìm thấy chuyến đi với mã "${shortKey}".`);
+                        throw new Error(`${t('errNotFound')} "${shortKey}".`);
                     }
                 }
 
-                // Tải dữ liệu chuyến đi từ targetBinId
                 const response = await fetch(`${JSONBIN_BASE_URL}/${targetBinId}/latest`, {
                     method: 'GET',
                     headers: {
@@ -434,30 +703,33 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Không thể tải dữ liệu chuyến đi (Mã lỗi ${response.status}).`);
+                    throw new Error(`${t('errLoadFail')} (${response.status}).`);
                 }
 
                 const data = await response.json();
                 currentTripData = data.record ? data.record : data;
                 renderTripOverview(shortKey);
             } catch (err) {
-                showKeyEntryGate(err.message || "Mã chia sẻ không hợp lệ hoặc đã bị xoá.");
+                showKeyEntryGate(err.message || t('errInvalid'));
             }
         }
 
-        function renderTripOverview(rawKey) {
+        function renderTripOverview(rawKey, panelToOpen = 'members') {
+            currentRawKey = rawKey || currentRawKey;
             document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('keyEntryScreen').classList.add('hidden');
             document.getElementById('topNavbar').classList.remove('hidden');
             document.getElementById('tripContent').classList.remove('hidden');
 
             const trip = currentTripData;
-            document.title = `${trip.title || 'Chuyến đi'} - Travel With Friends`;
-            document.getElementById('tripTitle').innerText = trip.title || 'Chuyến Đi';
-            document.getElementById('tripTypeText').innerText = trip.tripType || 'Du lịch nhóm';
+            document.title = `${trip.title || t('tripDefaultTitle')} - Travel With Friends`;
+            document.getElementById('tripTitle').innerText = trip.title || t('tripDefaultTitle');
+
+            const isGathering = trip.tripType === 'Tụ tập / Ăn uống';
+            document.getElementById('tripTypeText').innerText = isGathering ? t('gathering') : t('groupTravel');
 
             const badge = document.getElementById('tripTypeBadge');
-            if (trip.tripType === 'Tụ tập / Ăn uống') {
+            if (isGathering) {
                 badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-3 bg-emerald-100 text-emerald-700";
                 document.getElementById('tripDates').classList.add('hidden');
                 ['card-hotels', 'card-transports', 'card-itineraries', 'card-vouchers'].forEach(id => {
@@ -472,8 +744,8 @@
                 });
             }
 
-            document.getElementById('shareCodeBadge').innerText = `Mã: ${trip.shareCode || rawKey}`;
-            document.getElementById('updatedAtBadge').innerText = `Xuất lúc: ${formatDate(trip.exportedAt, true)}`;
+            document.getElementById('shareCodeBadge').innerText = `${t('codePrefix')}: ${trip.shareCode || rawKey}`;
+            document.getElementById('updatedAtBadge').innerText = `${t('exportedAt')}: ${formatDate(trip.exportedAt, true)}`;
 
             const membersCount = (trip.members || []).length;
             const hotelsCount = (trip.hotels || []).length;
@@ -482,14 +754,14 @@
             const vouchersCount = (trip.vouchers || []).length;
             const expensesCount = ((trip.expenses && trip.expenses.unifiedExpenses) || []).length;
 
-            document.getElementById('count-members').innerText = `${membersCount} người`;
-            document.getElementById('count-hotels').innerText = `${hotelsCount} địa điểm`;
-            document.getElementById('count-transports').innerText = `${transportsCount} lượt`;
-            document.getElementById('count-itineraries').innerText = `${itinerariesCount} hoạt động`;
-            document.getElementById('count-vouchers').innerText = `${vouchersCount} mã lưu trữ`;
-            document.getElementById('count-expenses').innerText = `${expensesCount} khoản giao dịch`;
+            document.getElementById('count-members').innerText = `${membersCount} ${t('unitMembers')}`;
+            document.getElementById('count-hotels').innerText = `${hotelsCount} ${t('unitHotels')}`;
+            document.getElementById('count-transports').innerText = `${transportsCount} ${t('unitTransports')}`;
+            document.getElementById('count-itineraries').innerText = `${itinerariesCount} ${t('unitItineraries')}`;
+            document.getElementById('count-vouchers').innerText = `${vouchersCount} ${t('unitVouchers')}`;
+            document.getElementById('count-expenses').innerText = `${expensesCount} ${t('unitExpenses')}`;
 
-            openPanel('members');
+            openPanel(panelToOpen);
         }
 
         function highlightActiveCard(panelName) {
@@ -498,9 +770,9 @@
                 const el = document.getElementById(`card-${c}`);
                 if (!el) return;
                 if (c === panelName) {
-                    el.classList.add('ring-2', 'ring-offset-2', 'ring-emerald-600');
+                    el.classList.add('ring-2', 'ring-offset-2', 'ring-blue-600');
                 } else {
-                    el.classList.remove('ring-2', 'ring-offset-2', 'ring-emerald-600');
+                    el.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-600');
                 }
             });
         }
@@ -515,40 +787,40 @@
             const bodyEl = document.getElementById('panelBody');
 
             if (panelName === 'members') {
-                iconEl.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm bg-blue-600 shadow-xs";
+                iconEl.className = "w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm bg-blue-600 shadow-xs";
                 iconEl.innerHTML = '<i class="fa-solid fa-users"></i>';
-                titleEl.innerText = "Danh Sách Thành Viên";
-                subEl.innerText = `${(currentTripData.members || []).length} thành viên trong chuyến đi`;
+                titleEl.innerText = t('pTitleMembers');
+                subEl.innerText = `${(currentTripData.members || []).length} ${t('pSubMembers')}`;
                 bodyEl.innerHTML = renderMembersPanel();
             } else if (panelName === 'hotels') {
-                iconEl.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm bg-orange-500 shadow-xs";
+                iconEl.className = "w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm bg-orange-500 shadow-xs";
                 iconEl.innerHTML = '<i class="fa-solid fa-hotel"></i>';
-                titleEl.innerText = "Nơi Ở & Phân Phòng";
-                subEl.innerText = `${(currentTripData.hotels || []).length} địa điểm lưu trú`;
+                titleEl.innerText = t('pTitleHotels');
+                subEl.innerText = `${(currentTripData.hotels || []).length} ${t('pSubHotels')}`;
                 bodyEl.innerHTML = renderHotelsPanel();
             } else if (panelName === 'transports') {
-                iconEl.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm bg-purple-600 shadow-xs";
+                iconEl.className = "w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm bg-purple-600 shadow-xs";
                 iconEl.innerHTML = '<i class="fa-solid fa-plane-departure"></i>';
-                titleEl.innerText = "Lịch Trình Di Chuyển";
-                subEl.innerText = `Vé máy bay, tàu xe, quá cảnh & thuê xe`;
+                titleEl.innerText = t('pTitleTransports');
+                subEl.innerText = t('pSubTransports');
                 bodyEl.innerHTML = renderTransportsPanel();
             } else if (panelName === 'itineraries') {
-                iconEl.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm bg-emerald-600 shadow-xs";
+                iconEl.className = "w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm bg-emerald-600 shadow-xs";
                 iconEl.innerHTML = '<i class="fa-solid fa-map-location-dot"></i>';
-                titleEl.innerText = "Lịch Trình Hoạt Động";
-                subEl.innerText = `Chi tiết các điểm đến theo từng ngày`;
+                titleEl.innerText = t('pTitleItineraries');
+                subEl.innerText = t('pSubItineraries');
                 bodyEl.innerHTML = renderItinerariesPanel();
             } else if (panelName === 'vouchers') {
-                iconEl.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm bg-pink-600 shadow-xs";
+                iconEl.className = "w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm bg-pink-600 shadow-xs";
                 iconEl.innerHTML = '<i class="fa-solid fa-ticket"></i>';
-                titleEl.innerText = "Voucher & Vé Tham Quan";
-                subEl.innerText = `Mã kích hoạt, vé sự kiện và phân bổ chi phí`;
+                titleEl.innerText = t('pTitleVouchers');
+                subEl.innerText = t('pSubVouchers');
                 bodyEl.innerHTML = renderVouchersPanel();
             } else if (panelName === 'expenses') {
-                iconEl.className = "w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm bg-teal-600 shadow-xs";
+                iconEl.className = "w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm bg-teal-600 shadow-xs";
                 iconEl.innerHTML = '<i class="fa-solid fa-wallet"></i>';
-                titleEl.innerText = "Quản Lý Chi Tiêu & Công Nợ";
-                subEl.innerText = `Tổng hợp đồng bộ tự động, nhập tay, chuyển tiền & số dư`;
+                titleEl.innerText = t('pTitleExpenses');
+                subEl.innerText = t('pSubExpenses');
                 bodyEl.innerHTML = renderExpensesPanel();
             }
         }
@@ -556,7 +828,7 @@
         function renderMembersPanel() {
             const members = currentTripData.members || [];
             if (!members.length) {
-                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-users-slash text-3xl mb-2"></i><p>Chưa có thành viên nào.</p></div>`;
+                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-users-slash text-3xl mb-2"></i><p>${t('emptyMembers')}</p></div>`;
             }
 
             return `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -575,8 +847,8 @@
                                 ${m.fullName ? `<div class="text-xs text-slate-600 font-medium mt-0.5">${m.fullName}</div>` : ''}
                                 <div class="mt-2 space-y-1 text-xs text-slate-500">
                                     ${m.phoneNumber ? `<div><i class="fa-solid fa-phone text-[10px] text-blue-500 mr-1.5"></i><a href="tel:${m.phoneNumber}" class="hover:underline text-blue-600">${m.phoneNumber}</a></div>` : ''}
-                                    ${m.birthDate ? `<div><i class="fa-solid fa-cake-candles text-[10px] text-pink-500 mr-1.5"></i>Sinh nhật: ${formatDate(m.birthDate)}</div>` : ''}
-                                    ${m.passportNumber ? `<div><i class="fa-solid fa-passport text-[10px] text-indigo-500 mr-1.5"></i>Hộ chiếu/CCCD: <span class="font-mono font-semibold text-slate-700">${m.passportNumber}</span> ${m.passportExpiryDate ? `(Hạn: ${formatDate(m.passportExpiryDate)})` : ''}</div>` : ''}
+                                    ${m.birthDate ? `<div><i class="fa-solid fa-cake-candles text-[10px] text-pink-500 mr-1.5"></i>${t('birthday')}: ${formatDate(m.birthDate)}</div>` : ''}
+                                    ${m.passportNumber ? `<div><i class="fa-solid fa-passport text-[10px] text-indigo-500 mr-1.5"></i>${t('passportId')}: <span class="font-mono font-semibold text-slate-700">${m.passportNumber}</span> ${m.passportExpiryDate ? `(${t('expiry')}: ${formatDate(m.passportExpiryDate)})` : ''}</div>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -588,7 +860,7 @@
         function renderHotelsPanel() {
             const hotels = currentTripData.hotels || [];
             if (!hotels.length) {
-                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-bed text-3xl mb-2"></i><p>Chưa có thông tin khách sạn / nơi ở.</p></div>`;
+                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-bed text-3xl mb-2"></i><p>${t('emptyHotels')}</p></div>`;
             }
 
             return `<div class="space-y-4">
@@ -619,7 +891,7 @@
                             <div class="pt-1">
                                 <div class="text-xs font-bold text-slate-700 mb-2">
                                     <i class="fa-solid fa-door-open text-orange-500 mr-1"></i>
-                                    ${h.isSameRoomPrice ? 'Đồng giá (Gộp chung)' : `Danh sách phòng (${h.rooms.length} phòng)`}:
+                                    ${h.isSameRoomPrice ? t('sameRoomPrice') : `${t('roomList')} (${h.rooms.length} ${t('roomsUnit')})`}:
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                     ${h.rooms.map(r => `
@@ -627,13 +899,13 @@
                                             <div class="flex items-center justify-between">
                                                 <span class="font-bold text-xs text-slate-800">• ${r.name}</span>
                                                 <div class="flex items-center gap-1.5">
-                                                    ${r.payer ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px]">Trả: ${r.payer}</span>` : ''}
+                                                    ${r.payer ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px]">${t('paidBy')}: ${r.payer}</span>` : ''}
                                                     <span class="font-extrabold text-xs text-slate-900">${formatMoney(r.price, r.currency)}</span>
                                                 </div>
                                             </div>
                                             <div class="text-[11px] text-slate-500">
                                                 <i class="fa-solid fa-user-check text-blue-500 mr-1"></i>
-                                                Thành viên: <span class="font-medium text-slate-700">${(r.members && r.members.length) ? r.members.join(', ') : 'Chưa xếp'}</span>
+                                                ${t('membersLabel')}: <span class="font-medium text-slate-700">${(r.members && r.members.length) ? r.members.join(', ') : t('unassigned')}</span>
                                             </div>
                                         </div>
                                     `).join('')}
@@ -650,103 +922,103 @@
         function renderTransportsPanel() {
             const transports = currentTripData.transports || [];
             if (!transports.length) {
-                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-plane-slash text-3xl mb-2"></i><p>Chưa có thông tin di chuyển.</p></div>`;
+                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-plane-slash text-3xl mb-2"></i><p>${t('emptyTransports')}</p></div>`;
             }
 
             return `<div class="space-y-4">
-                ${transports.map(t => {
-                    const outTransits = (t.transits || []).filter(tr => !tr.isReturn);
-                    const inTransits = (t.transits || []).filter(tr => tr.isReturn);
+                ${transports.map(trItem => {
+                    const outTransits = (trItem.transits || []).filter(tr => !tr.isReturn);
+                    const inTransits = (trItem.transits || []).filter(tr => tr.isReturn);
 
                     return `
                     <div class="rounded-2xl border border-purple-200/80 bg-gradient-to-br from-purple-50/40 to-white p-5 shadow-xs space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <div class="flex items-center gap-2.5">
                                 <span class="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs">
-                                    <i class="fa-solid ${t.type === 'Máy bay' ? 'fa-plane' : (t.type === 'Thuê xe' ? 'fa-car' : 'fa-bus')}"></i>
+                                    <i class="fa-solid ${trItem.type === 'Máy bay' ? 'fa-plane' : (trItem.type === 'Thuê xe' ? 'fa-car' : 'fa-bus')}"></i>
                                 </span>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <span class="font-extrabold text-sm text-slate-900">${t.type}</span>
-                                        ${t.vehicleNumber ? `<span class="px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-mono font-bold text-xs">${t.vehicleNumber}</span>` : ''}
-                                        ${t.type !== 'Thuê xe' ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${t.isRoundTrip ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}">${t.isRoundTrip ? 'Khứ hồi' : '1 chiều'}</span>` : ''}
+                                        <span class="font-extrabold text-sm text-slate-900">${trItem.type}</span>
+                                        ${trItem.vehicleNumber ? `<span class="px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-mono font-bold text-xs">${trItem.vehicleNumber}</span>` : ''}
+                                        ${trItem.type !== 'Thuê xe' ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${trItem.isRoundTrip ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}">${trItem.isRoundTrip ? t('roundTrip') : t('oneWay')}</span>` : ''}
                                     </div>
-                                    ${t.type === 'Thuê xe' ? `<div class="text-xs text-slate-600 font-semibold mt-0.5">${t.rentalShop} ${t.phoneNumber ? `• 📞 ${t.phoneNumber}` : ''}</div>` : ''}
+                                    ${trItem.type === 'Thuê xe' ? `<div class="text-xs text-slate-600 font-semibold mt-0.5">${trItem.rentalShop} ${trItem.phoneNumber ? `• 📞 ${trItem.phoneNumber}` : ''}</div>` : ''}
                                 </div>
                             </div>
                             <div class="text-right">
-                                ${t.payer ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px] mr-1">Trả: ${t.payer}</span>` : ''}
-                                <span class="font-extrabold text-sm text-purple-900">${formatMoney(t.totalPrice, t.currency)}</span>
+                                ${trItem.payer ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold text-[10px] mr-1">${t('paidBy')}: ${trItem.payer}</span>` : ''}
+                                <span class="font-extrabold text-sm text-purple-900">${formatMoney(trItem.totalPrice, trItem.currency)}</span>
                             </div>
                         </div>
 
-                        ${t.type !== 'Thuê xe' ? `
+                        ${trItem.type !== 'Thuê xe' ? `
                             <div class="p-3.5 rounded-xl bg-white border border-purple-100 space-y-2">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <div class="font-bold text-sm text-blue-900">
-                                        🛫 ${t.origin} <i class="fa-solid fa-arrow-right mx-1.5 text-slate-400 text-xs"></i> 🛬 ${t.destination}
+                                        🛫 ${trItem.origin} <i class="fa-solid fa-arrow-right mx-1.5 text-slate-400 text-xs"></i> 🛬 ${trItem.destination}
                                     </div>
-                                    ${t.originBookingCode ? `<span class="text-xs font-mono font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">PNR: ${t.originBookingCode}</span>` : ''}
+                                    ${trItem.originBookingCode ? `<span class="text-xs font-mono font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">PNR: ${trItem.originBookingCode}</span>` : ''}
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
-                                    <div><b>Khởi hành:</b> ${formatDate(t.departureTime, true)} ${t.originNote ? `<span class="text-slate-400">(${t.originNote})</span>` : ''}</div>
-                                    <div><b>Đến nơi:</b> ${formatDate(t.arrivalTime, true)} ${t.destinationNote ? `<span class="text-slate-400">(${t.destinationNote})</span>` : ''}</div>
+                                    <div><b>${t('departure')}:</b> ${formatDate(trItem.departureTime, true)} ${trItem.originNote ? `<span class="text-slate-400">(${trItem.originNote})</span>` : ''}</div>
+                                    <div><b>${t('arrival')}:</b> ${formatDate(trItem.arrivalTime, true)} ${trItem.destinationNote ? `<span class="text-slate-400">(${trItem.destinationNote})</span>` : ''}</div>
                                 </div>
 
                                 ${outTransits.map((tr, idx) => `
                                     <div class="p-2.5 rounded-lg bg-amber-50/80 border-l-4 border-amber-400 text-xs space-y-1">
-                                        <div class="font-bold text-amber-900">⏳ Quá cảnh ${idx + 1}: ${tr.airportOrCity} ${tr.vehicleNumber ? `• Chuyến tiếp: <span class="font-mono">${tr.vehicleNumber}</span>` : ''} ${tr.bookingCode ? `• PNR: <span class="text-red-600">${tr.bookingCode}</span>` : ''}</div>
-                                        <div class="text-slate-600">Đến: ${formatDate(tr.arrivalTime, true)} ➔ Đi: ${formatDate(tr.departureTime, true)}</div>
+                                        <div class="font-bold text-amber-900">⏳ ${t('transit')} ${idx + 1}: ${tr.airportOrCity} ${tr.vehicleNumber ? `• ${t('nextFlight')}: <span class="font-mono">${tr.vehicleNumber}</span>` : ''} ${tr.bookingCode ? `• PNR: <span class="text-red-600">${tr.bookingCode}</span>` : ''}</div>
+                                        <div class="text-slate-600">${t('arrival')}: ${formatDate(tr.arrivalTime, true)} ➔ ${t('departure')}: ${formatDate(tr.departureTime, true)}</div>
                                         ${tr.note ? `<div class="text-slate-500 italic">📝 ${tr.note}</div>` : ''}
                                     </div>
                                 `).join('')}
                             </div>
                         ` : `
                             <div class="text-xs text-slate-600 bg-white p-3 rounded-xl border border-slate-100">
-                                <b>Nhận xe:</b> ${formatDate(t.departureTime, true)} — <b>Trả xe:</b> ${formatDate(t.arrivalTime, true)}
+                                <b>${t('pickupCar')}:</b> ${formatDate(trItem.departureTime, true)} — <b>${t('returnCar')}:</b> ${formatDate(trItem.arrivalTime, true)}
                             </div>
                         `}
 
-                        ${(t.isRoundTrip && t.type !== 'Thuê xe') ? `
+                        ${(trItem.isRoundTrip && trItem.type !== 'Thuê xe') ? `
                             <div class="p-3.5 rounded-xl bg-purple-50/50 border border-purple-200/70 space-y-2">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <div class="font-bold text-sm text-purple-900">
-                                        🔄 [Chiều về] ${t.returnVehicleNumber ? `[${t.returnVehicleNumber}]` : ''} ${t.returnOrigin} <i class="fa-solid fa-arrow-right mx-1.5 text-slate-400 text-xs"></i> ${t.returnDestination}
+                                        🔄 [${t('returnLeg')}] ${trItem.returnVehicleNumber ? `[${trItem.returnVehicleNumber}]` : ''} ${trItem.returnOrigin} <i class="fa-solid fa-arrow-right mx-1.5 text-slate-400 text-xs"></i> ${trItem.returnDestination}
                                     </div>
-                                    ${t.returnOriginBookingCode ? `<span class="text-xs font-mono font-bold text-red-600 bg-white px-2 py-0.5 rounded">PNR: ${t.returnOriginBookingCode}</span>` : ''}
+                                    ${trItem.returnOriginBookingCode ? `<span class="text-xs font-mono font-bold text-red-600 bg-white px-2 py-0.5 rounded">PNR: ${trItem.returnOriginBookingCode}</span>` : ''}
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
-                                    <div><b>Khởi hành:</b> ${formatDate(t.returnDepartureTime, true)} ${t.returnOriginNote ? `<span class="text-slate-400">(${t.returnOriginNote})</span>` : ''}</div>
-                                    <div><b>Đến nơi:</b> ${formatDate(t.returnArrivalTime, true)} ${t.returnDestinationNote ? `<span class="text-slate-400">(${t.returnDestinationNote})</span>` : ''}</div>
+                                    <div><b>${t('departure')}:</b> ${formatDate(trItem.returnDepartureTime, true)} ${trItem.returnOriginNote ? `<span class="text-slate-400">(${trItem.returnOriginNote})</span>` : ''}</div>
+                                    <div><b>${t('arrival')}:</b> ${formatDate(trItem.returnArrivalTime, true)} ${trItem.returnDestinationNote ? `<span class="text-slate-400">(${trItem.returnDestinationNote})</span>` : ''}</div>
                                 </div>
 
                                 ${inTransits.map((tr, idx) => `
                                     <div class="p-2.5 rounded-lg bg-amber-50 border-l-4 border-amber-400 text-xs space-y-1">
-                                        <div class="font-bold text-amber-900">⏳ Quá cảnh về ${idx + 1}: ${tr.airportOrCity} ${tr.vehicleNumber ? `• Chuyến tiếp: <span class="font-mono">${tr.vehicleNumber}</span>` : ''} ${tr.bookingCode ? `• PNR: <span class="text-red-600">${tr.bookingCode}</span>` : ''}</div>
-                                        <div class="text-slate-600">Đến: ${formatDate(tr.arrivalTime, true)} ➔ Đi: ${formatDate(tr.departureTime, true)}</div>
+                                        <div class="font-bold text-amber-900">⏳ ${t('returnTransit')} ${idx + 1}: ${tr.airportOrCity} ${tr.vehicleNumber ? `• ${t('nextFlight')}: <span class="font-mono">${tr.vehicleNumber}</span>` : ''} ${tr.bookingCode ? `• PNR: <span class="text-red-600">${tr.bookingCode}</span>` : ''}</div>
+                                        <div class="text-slate-600">${t('arrival')}: ${formatDate(tr.arrivalTime, true)} ➔ ${t('departure')}: ${formatDate(tr.departureTime, true)}</div>
                                         ${tr.note ? `<div class="text-slate-500 italic">📝 ${tr.note}</div>` : ''}
                                     </div>
                                 `).join('')}
                             </div>
                         ` : ''}
 
-                        ${(t.passengers && t.passengers.length) ? `
+                        ${(trItem.passengers && trItem.passengers.length) ? `
                             <div class="pt-1">
-                                <div class="text-xs font-bold text-slate-700 mb-1.5">Chi tiết vé thành viên (${t.isSamePrice ? 'Đồng giá' : 'Theo vé'}):</div>
+                                <div class="text-xs font-bold text-slate-700 mb-1.5">${t('ticketDetail')} (${trItem.isSamePrice ? t('samePrice') : t('perTicket')}):</div>
                                 <div class="flex flex-wrap gap-2">
-                                    ${t.passengers.map(p => `
+                                    ${trItem.passengers.map(p => `
                                         <div class="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-xs flex items-center gap-1.5">
                                             <span class="font-bold text-slate-800">${p.memberName}</span>
                                             <span class="text-slate-400">|</span>
-                                            <span class="text-purple-700 font-semibold">${formatMoney(p.price + (p.baggagePrice || 0), t.currency)}</span>
-                                            ${p.baggagePrice > 0 ? `<span class="text-[10px] text-slate-400">(Hành lý: ${formatMoney(p.baggagePrice)})</span>` : ''}
+                                            <span class="text-purple-700 font-semibold">${formatMoney(p.price + (p.baggagePrice || 0), trItem.currency)}</span>
+                                            ${p.baggagePrice > 0 ? `<span class="text-[10px] text-slate-400">(${t('baggage')}: ${formatMoney(p.baggagePrice)})</span>` : ''}
                                         </div>
                                     `).join('')}
                                 </div>
                             </div>
                         ` : ''}
 
-                        ${t.note ? `<div class="text-xs text-slate-500 italic bg-slate-50 p-2.5 rounded-xl">${t.note}</div>` : ''}
+                        ${trItem.note ? `<div class="text-xs text-slate-500 italic bg-slate-50 p-2.5 rounded-xl">${trItem.note}</div>` : ''}
                     </div>
                     `;
                 }).join('')}
@@ -756,13 +1028,13 @@
         function renderItinerariesPanel() {
             const items = currentTripData.itineraries || [];
             if (!items.length) {
-                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-calendar-xmark text-3xl mb-2"></i><p>Chưa có hoạt động nào trong lịch trình.</p></div>`;
+                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-calendar-xmark text-3xl mb-2"></i><p>${t('emptyItineraries')}</p></div>`;
             }
 
             const groups = {};
             items.forEach(item => {
                 const d = new Date(item.time || item.date);
-                const dayKey = isNaN(d.getTime()) ? 'Khác' : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                const dayKey = isNaN(d.getTime()) ? 'Other' : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                 if (!groups[dayKey]) groups[dayKey] = [];
                 groups[dayKey].push(item);
             });
@@ -773,11 +1045,14 @@
                 ${sortedDays.map((dayKey, idx) => {
                     const dayItems = groups[dayKey];
                     const firstDate = dayItems[0]?.time || dayItems[0]?.date;
+                    const dayHeader = currentLang === 'ja'
+                        ? `${idx + 1}${t('dayPrefix')} (${formatDate(firstDate)})`
+                        : (currentLang === 'zh-Hans' ? `${t('dayPrefix')}${idx + 1}天 (${formatDate(firstDate)})` : `${t('dayPrefix')} ${idx + 1} (${formatDate(firstDate)})`);
                     return `
                         <div class="space-y-3">
                             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold text-xs">
                                 <i class="fa-solid fa-calendar-day"></i>
-                                <span>Ngày ${idx + 1} (${formatDate(firstDate)})</span>
+                                <span>${dayHeader}</span>
                             </div>
                             <div class="relative pl-6 border-l-2 border-emerald-200 space-y-3 ml-2">
                                 ${dayItems.map(it => {
@@ -805,7 +1080,7 @@
         function renderVouchersPanel() {
             const vouchers = currentTripData.vouchers || [];
             if (!vouchers.length) {
-                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-ticket-simple text-3xl mb-2"></i><p>Chưa có Voucher hoặc Vé tham quan nào.</p></div>`;
+                return `<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-ticket-simple text-3xl mb-2"></i><p>${t('emptyVouchers')}</p></div>`;
             }
 
             return `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -826,12 +1101,12 @@
                             </div>
 
                             <div class="text-xs text-orange-700 font-medium">
-                                <i class="fa-regular fa-clock mr-1"></i>Hạn/Ngày dùng: ${formatDate(v.expiryDate, true)}
+                                <i class="fa-regular fa-clock mr-1"></i>${t('validDate')}: ${formatDate(v.expiryDate, true)}
                             </div>
 
                             ${(v.textCodes && v.textCodes.length) ? `
                                 <div class="p-2.5 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-800 text-xs font-mono font-bold break-all">
-                                    <i class="fa-solid fa-qrcode mr-1.5"></i>Mã: ${v.textCodes.join(', ')}
+                                    <i class="fa-solid fa-qrcode mr-1.5"></i>${t('codeLabel')}: ${v.textCodes.join(', ')}
                                 </div>
                             ` : ''}
 
@@ -848,7 +1123,7 @@
                         </div>
 
                         <div class="pt-2 border-t border-pink-100 flex items-center justify-between text-[11px] text-slate-500">
-                            <span>Người trả: <b class="text-emerald-700">${v.payer || 'Chưa chọn'}</b></span>
+                            <span>${t('payerLabel')}: <b class="text-emerald-700">${v.payer || t('notSelected')}</b></span>
                             ${v.note ? `<span class="italic truncate max-w-[180px]">📝 ${v.note}</span>` : ''}
                         </div>
                     </div>
@@ -870,14 +1145,14 @@
                     return Math.abs(val) > 0.01;
                 });
 
-                let statusHtml = `<span class="text-xs text-slate-400 font-medium">Đã thanh toán đủ</span>`;
+                let statusHtml = `<span class="text-xs text-slate-400 font-medium">${t('settledUp')}</span>`;
                 if (activeCurs.length > 0) {
                     statusHtml = activeCurs.map(cur => {
                         const val = balances[cur][mName];
                         if (val > 0) {
-                            return `<div class="text-xs font-bold text-emerald-600">Được nhận: +${formatMoney(val, cur)}</div>`;
+                            return `<div class="text-xs font-bold text-emerald-600">${t('toReceive')}: +${formatMoney(val, cur)}</div>`;
                         } else {
-                            return `<div class="text-xs font-bold text-red-600">Phải trả: -${formatMoney(Math.abs(val), cur)}</div>`;
+                            return `<div class="text-xs font-bold text-red-600">${t('toPay')}: -${formatMoney(Math.abs(val), cur)}</div>`;
                         }
                     }).join('');
                 }
@@ -908,15 +1183,15 @@
                                 <span class="font-bold text-sm text-slate-800">${item.title}</span>
                                 <span class="text-[11px] text-slate-400">${formatDate(item.date)}</span>
                             </div>
-                            <div class="text-xs text-emerald-700 font-medium">💳 Trả: ${payersList || 'Chưa rõ'}</div>
-                            <div class="text-xs text-blue-600">👥 Hưởng: ${consumersList || 'Chưa rõ'}</div>
+                            <div class="text-xs text-emerald-700 font-medium">💳 ${t('paidBy')}: ${payersList || t('unknown')}</div>
+                            <div class="text-xs text-blue-600">👥 ${t('beneficiary')}: ${consumersList || t('unknown')}</div>
                         </div>
                         <div class="text-right sm:shrink-0">
                             <span class="font-extrabold text-sm text-slate-900">${formatMoney(item.amount, item.currency)}</span>
                         </div>
                     </div>
                 `;
-            }).join('') : `<p class="text-xs text-slate-400 italic py-4 text-center">Chưa có khoản chi tiêu nào.</p>`;
+            }).join('') : `<p class="text-xs text-slate-400 italic py-4 text-center">${t('emptyExpenses')}</p>`;
 
             const transferHtml = transfers.length ? transfers.map(tr => `
                 <div class="p-3 rounded-xl bg-indigo-50/50 border border-indigo-100 flex items-center justify-between text-xs">
@@ -926,17 +1201,17 @@
                             <i class="fa-solid fa-arrow-right mx-1.5 text-slate-400"></i>
                             <span class="text-blue-700">${tr.recipient || '?'}</span>
                         </div>
-                        <div class="text-slate-500 mt-0.5">${tr.note ? `Nội dung: ${tr.note} • ` : ''}${formatDate(tr.date)}</div>
+                        <div class="text-slate-500 mt-0.5">${tr.note ? `${t('noteLabel')}: ${tr.note} • ` : ''}${formatDate(tr.date)}</div>
                     </div>
                     <div class="font-extrabold text-indigo-700 text-sm">${formatMoney(tr.amount, tr.currency)}</div>
                 </div>
-            `).join('') : `<p class="text-xs text-slate-400 italic py-2">Chưa có giao dịch chuyển tiền nào.</p>`;
+            `).join('') : `<p class="text-xs text-slate-400 italic py-2">${t('emptyTransfers')}</p>`;
 
             return `
                 <div class="space-y-6">
                     <div>
                         <div class="flex items-center justify-between mb-2.5">
-                            <h3 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-scale-balanced text-teal-600 mr-1.5"></i>Bảng Cân Đối Số Dư (Chạm vào tên để xem chi tiết)</h3>
+                            <h3 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-scale-balanced text-teal-600 mr-1.5"></i>${t('balanceTitle')}</h3>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             ${memberBalanceCards}
@@ -944,12 +1219,12 @@
                     </div>
 
                     <div>
-                        <h3 class="font-bold text-sm text-slate-800 mb-2.5"><i class="fa-solid fa-money-bill-transfer text-indigo-600 mr-1.5"></i>Giao Dịch Chuyển Tiền Nội Bộ</h3>
+                        <h3 class="font-bold text-sm text-slate-800 mb-2.5"><i class="fa-solid fa-money-bill-transfer text-indigo-600 mr-1.5"></i>${t('transferTitle')}</h3>
                         <div class="space-y-2">${transferHtml}</div>
                     </div>
 
                     <div>
-                        <h3 class="font-bold text-sm text-slate-800 mb-2.5"><i class="fa-solid fa-receipt text-orange-500 mr-1.5"></i>Tất Cả Khoản Chi (${unified.length})</h3>
+                        <h3 class="font-bold text-sm text-slate-800 mb-2.5"><i class="fa-solid fa-receipt text-orange-500 mr-1.5"></i>${t('allExpensesTitle')} (${unified.length})</h3>
                         <div class="space-y-2.5">${unifiedHtml}</div>
                     </div>
                 </div>
@@ -962,7 +1237,7 @@
             const transfers = [...(expData.transfers || [])].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
             const balances = expData.balancesByCurrency || {};
 
-            document.getElementById('modalMemberName').innerText = `Báo cáo: ${memberName}`;
+            document.getElementById('modalMemberName').innerText = `${t('reportFor')}: ${memberName}`;
 
             const totalConsumed = {};
             const memberExpLogs = [];
@@ -978,17 +1253,17 @@
                 }
             });
 
-            const memberTransfers = transfers.filter(t => t.sender === memberName || t.recipient === memberName);
+            const memberTransfers = transfers.filter(tr => tr.sender === memberName || tr.recipient === memberName);
 
             const consumedSummaryHtml = Object.keys(totalConsumed).length
-                ? Object.entries(totalConsumed).map(([cur, val]) => `<div class="flex justify-between"><span>Tiền tệ <b>${cur}</b>:</span><span class="font-bold text-blue-600">${formatMoney(val, cur)}</span></div>`).join('')
-                : `<div class="text-slate-400">Chưa có chi tiêu nào</div>`;
+                ? Object.entries(totalConsumed).map(([cur, val]) => `<div class="flex justify-between"><span>${t('currencyLabel')} <b>${cur}</b>:</span><span class="font-bold text-blue-600">${formatMoney(val, cur)}</span></div>`).join('')
+                : `<div class="text-slate-400">${t('emptyExpenses')}</div>`;
 
             const balanceSummaryHtml = Object.keys(balances).map(cur => {
                 const bal = balances[cur]?.[memberName] || 0;
-                if (bal > 0.01) return `<div class="flex justify-between"><span>Số dư <b>${cur}</b>:</span><span class="font-bold text-emerald-600">Được nhận +${formatMoney(bal, cur)}</span></div>`;
-                if (bal < -0.01) return `<div class="flex justify-between"><span>Số dư <b>${cur}</b>:</span><span class="font-bold text-red-600">Phải trả -${formatMoney(Math.abs(bal), cur)}</span></div>`;
-                return `<div class="flex justify-between"><span>Số dư <b>${cur}</b>:</span><span class="text-slate-400">Đã thanh toán đủ (0)</span></div>`;
+                if (bal > 0.01) return `<div class="flex justify-between"><span>${t('balanceLabel')} <b>${cur}</b>:</span><span class="font-bold text-emerald-600">${t('toReceive')} +${formatMoney(bal, cur)}</span></div>`;
+                if (bal < -0.01) return `<div class="flex justify-between"><span>${t('balanceLabel')} <b>${cur}</b>:</span><span class="font-bold text-red-600">${t('toPay')} -${formatMoney(Math.abs(bal), cur)}</span></div>`;
+                return `<div class="flex justify-between"><span>${t('balanceLabel')} <b>${cur}</b>:</span><span class="text-slate-400">${t('settledZero')}</span></div>`;
             }).join('');
 
             const logsHtml = memberExpLogs.map(l => `
@@ -998,36 +1273,36 @@
                         <span class="text-slate-400 font-normal">${formatDate(l.date)}</span>
                     </div>
                     <div class="flex justify-between">
-                        ${l.paid > 0 ? `<span class="text-emerald-600 font-semibold">Chi trả: ${formatMoney(l.paid, l.currency)}</span>` : '<span></span>'}
-                        ${l.consumed > 0 ? `<span class="text-blue-600 font-semibold">Hưởng: ${formatMoney(l.consumed, l.currency)}</span>` : ''}
+                        ${l.paid > 0 ? `<span class="text-emerald-600 font-semibold">${t('paidAction')}: ${formatMoney(l.paid, l.currency)}</span>` : '<span></span>'}
+                        ${l.consumed > 0 ? `<span class="text-blue-600 font-semibold">${t('beneficiary')}: ${formatMoney(l.consumed, l.currency)}</span>` : ''}
                     </div>
                 </div>
             `).join('');
 
-            const transLogsHtml = memberTransfers.map(t => `
+            const transLogsHtml = memberTransfers.map(tr => `
                 <div class="p-2.5 rounded-xl border border-indigo-100 bg-indigo-50/40 flex justify-between items-center text-xs">
                     <div>
-                        <div class="font-bold text-slate-800">Chuyển tiền ${t.note ? `- ${t.note}` : ''}</div>
-                        <div class="text-slate-400">${formatDate(t.date)}</div>
+                        <div class="font-bold text-slate-800">${t('transferAction')} ${tr.note ? `- ${tr.note}` : ''}</div>
+                        <div class="text-slate-400">${formatDate(tr.date)}</div>
                     </div>
-                    ${t.sender === memberName
-                        ? `<span class="font-bold text-emerald-600">Chuyển đi: ${formatMoney(t.amount, t.currency)}</span>`
-                        : `<span class="font-bold text-amber-600">Nhận vào: ${formatMoney(t.amount, t.currency)}</span>`
+                    ${tr.sender === memberName
+                        ? `<span class="font-bold text-emerald-600">${t('sentOut')}: ${formatMoney(tr.amount, tr.currency)}</span>`
+                        : `<span class="font-bold text-amber-600">${t('receivedIn')}: ${formatMoney(tr.amount, tr.currency)}</span>`
                     }
                 </div>
             `).join('');
 
             document.getElementById('modalMemberBody').innerHTML = `
                 <div class="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100 space-y-1">
-                    <div class="font-bold text-xs text-blue-900 uppercase">Tổng chi tiêu (Thực tế đã hưởng)</div>
+                    <div class="font-bold text-xs text-blue-900 uppercase">${t('totalConsumedTitle')}</div>
                     ${consumedSummaryHtml}
                 </div>
                 <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100 space-y-1">
-                    <div class="font-bold text-xs text-emerald-900 uppercase">Tổng kết công nợ</div>
+                    <div class="font-bold text-xs text-emerald-900 uppercase">${t('debtSummaryTitle')}</div>
                     ${balanceSummaryHtml}
                 </div>
                 <div class="space-y-2">
-                    <div class="font-bold text-xs text-slate-700 uppercase">Lịch sử giao dịch (${memberExpLogs.length + memberTransfers.length})</div>
+                    <div class="font-bold text-xs text-slate-700 uppercase">${t('txHistoryTitle')} (${memberExpLogs.length + memberTransfers.length})</div>
                     ${logsHtml}
                     ${transLogsHtml}
                 </div>
